@@ -26,7 +26,7 @@ COR_CINZA_CLARO = "#F5F5F5"
 COR_AMARELO = "#FFC107"
 
 # --- Cabeçalho ---
-st.image("britvic-seeklogo.png", use_container_width=True)  # Insere o logotipo no topo.
+st.image("https://github.com/martins6231/app_atd/blob/01c758e5f03a6cf16ff3fa5d60eece2195771287/britvic-seeklogo.png", use_container_width=True)  # Insere o logotipo no topo.
 st.markdown(
     f"""
     <div style="background-color:{COR_VERDE};padding:15px;border-radius:10px">
