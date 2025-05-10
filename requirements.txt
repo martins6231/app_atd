@@ -1,6 +1,7 @@
-streamlit>=1.30.0
+streamlit>=1.25.0
 pandas>=1.5.0
-numpy>=1.21.0
+numpy>=1.23.0
 plotly>=5.0.0
-openpyxl>=3.0.10
-prophet>=1.1.2
+requests
+openpyxl
+prophet
