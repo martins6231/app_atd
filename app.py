@@ -10,7 +10,6 @@ import zipfile
 from prophet import Prophet
 import calendar
 from datetime import datetime
-import os
 
 # ----------- Paleta Britvic -----------
 COR_VERDE = "#006B3F"
@@ -24,16 +23,6 @@ st.set_page_config(
     layout="wide",
     page_icon="🍹"
 )
-
-# ----------- Carregar logo britvic -----------
-logo_path = "britvic-seeklogo.png"
-if os.path.isfile(logo_path):
-    try:
-        st.image(logo_path, use_container_width=True)
-    except Exception as e:
-        st.warning(f"Logo '{logo_path}' encontrada, mas não pôde ser exibida. Erro: {e}")
-else:
-    st.warning(f"Logo '{logo_path}' não encontrada! Por favor, verifique se o arquivo está no repositório.")
 
 # ----------- Cabeçalho estilizado -----------
 st.markdown(
@@ -130,9 +119,10 @@ def tratar_dados(df):
     return df_clean, erros
 
 df, erros = tratar_dados(df_raw)
-with st.expander("Relatório de problemas encontrados", expanded=len(erros)>0):
+with st.expander("Relatório de problemas encontrados", expanded=len(erros) > 0):
     if erros:
-        for e in erros: st.warning(e)
+        for e in erros:
+            st.warning(e)
     else:
         st.success("Nenhum problema crítico encontrado.")
 
@@ -167,6 +157,7 @@ if df_filtrado.empty:
     st.stop()
 
 # ---------------------- KPIs ----------------------
+
 def exibe_kpis(df, categoria):
     df_cat = df[df['categoria'] == categoria]
     if df_cat.empty:
@@ -191,6 +182,7 @@ def exibe_kpis(df, categoria):
 exibe_kpis(df_filtrado, categoria_analise)
 
 # ---------------------- Gráficos ----------------------
+
 def plot_tendencia(df, categoria):
     grupo = df[df['categoria'] == categoria].groupby('data')['caixas_produzidas'].sum().reset_index()
     if grupo.empty:
@@ -200,7 +192,7 @@ def plot_tendencia(df, categoria):
         grupo, x='data', y='caixas_produzidas',
         title=f"Tendência Diária - {categoria}",
         markers=True,
-        labels={"data":"Data", "caixas_produzidas":"Caixas Produzidas"}
+        labels={"data": "Data", "caixas_produzidas": "Caixas Produzidas"}
     )
     fig.update_traces(line_color=COR_VERDE, line_width=2, marker=dict(size=7, color=COR_AZUL))
     fig.update_layout(template="plotly_white", hovermode="x", plot_bgcolor=COR_BRANCA)
@@ -214,20 +206,18 @@ def plot_variacao_mensal(df, categoria):
     mensal = agrup.groupby([agrup['data'].dt.to_period('M')])['caixas_produzidas'].sum().reset_index()
     mensal['mes'] = mensal['data'].dt.strftime('%b/%Y')
     mensal['var_%'] = mensal['caixas_produzidas'].pct_change() * 100
-    # Barra produção mensal
     fig1 = px.bar(
         mensal, x='mes', y='caixas_produzidas',
         text_auto=True,
         title=f"Produção Mensal Total - {categoria}",
-        labels={"mes":"Mês/Ano", "caixas_produzidas":"Caixas Produzidas"},
+        labels={"mes": "Mês/Ano", "caixas_produzidas": "Caixas Produzidas"},
         color_discrete_sequence=[COR_VERDE]
     )
     fig1.update_layout(template="plotly_white")
-    # Linha variação %
     fig2 = px.line(
         mensal, x='mes', y='var_%', markers=True,
         title=f"Variação Percentual Mensal (%) - {categoria}",
-        labels={"mes":"Mês/Ano", "var_%":"Variação (%)"}
+        labels={"mes": "Mês/Ano", "var_%": "Variação (%)"}
     )
     fig2.update_traces(line_color=COR_AMARELO, marker=dict(size=7))
     fig2.update_layout(template="plotly_white")
@@ -236,6 +226,8 @@ def plot_variacao_mensal(df, categoria):
 
 plot_tendencia(df_filtrado, categoria_analise)
 plot_variacao_mensal(df_filtrado, categoria_analise)
+
+# (Continue inserindo outras funções de gráfico, previsão, insights, etc, conforme sua necessidade)
 
 # -- Exportação de dados filtrados --
 st.markdown(
@@ -254,6 +246,3 @@ if st.button("Exportar Dados Filtrados (.xlsx)"):
         file_name=f"producao_britvic_{categoria_analise}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-# ------------------------------------
-# DICA: Se quiser incluir mais gráficos, alertas dinâmicos, visuais customizados, pode incrementar usando os exemplos anteriores!
