@@ -26,10 +26,12 @@ st.set_page_config(
 )
 
 # ----------- Carregar logo britvic -----------
-
 logo_path = "britvic-seeklogo.png"
 if os.path.isfile(logo_path):
-    st.image(logo_path, use_container_width=True)
+    try:
+        st.image(logo_path, use_container_width=True)
+    except Exception as e:
+        st.warning(f"Logo '{logo_path}' encontrada, mas não pôde ser exibida. Erro: {e}")
 else:
     st.warning(f"Logo '{logo_path}' não encontrada! Por favor, verifique se o arquivo está no repositório.")
 
@@ -165,7 +167,6 @@ if df_filtrado.empty:
     st.stop()
 
 # ---------------------- KPIs ----------------------
-
 def exibe_kpis(df, categoria):
     df_cat = df[df['categoria'] == categoria]
     if df_cat.empty:
@@ -190,7 +191,6 @@ def exibe_kpis(df, categoria):
 exibe_kpis(df_filtrado, categoria_analise)
 
 # ---------------------- Gráficos ----------------------
-
 def plot_tendencia(df, categoria):
     grupo = df[df['categoria'] == categoria].groupby('data')['caixas_produzidas'].sum().reset_index()
     if grupo.empty:
@@ -236,8 +236,6 @@ def plot_variacao_mensal(df, categoria):
 
 plot_tendencia(df_filtrado, categoria_analise)
 plot_variacao_mensal(df_filtrado, categoria_analise)
-
-# (Continue inserindo outras funções de gráfico, previsão, insights, etc, conforme sua necessidade)
 
 # -- Exportação de dados filtrados --
 st.markdown(
