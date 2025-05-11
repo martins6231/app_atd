@@ -9,133 +9,103 @@ import tempfile
 import zipfile
 from prophet import Prophet
 import calendar
-from datetime import datetime
 
-# --------- PALETA BRITVIC ---------
-BRITVIC_PRIMARY = "#003057"        # Azul
-BRITVIC_ACCENT = "#27AE60"         # Verde
-BRITVIC_BG = "#F4FFF6"             # Fundo leve esverdeado
-BRITVIC_KPI_BG = "#e8f8ee"         # Fundo KPIs
-BRITVIC_CARD_SHADOW = "rgba(0, 48, 87, 0.13)"  # Sombra leve nos cartões
+# Cores Britvic
+BRITVIC_PRIMARY = "#003057"  # Azul Britvic
+BRITVIC_ACCENT = "#27AE60"   # Verde Britvic
+BRITVIC_BG = "#F4FFF6"       # Fundo suave esverdeado
 
-# --------- CSS ---------
+# Configuração da página
+st.set_page_config(
+    page_title="Dashboard de Produção - Britvic",
+    layout="wide",
+    page_icon="🧃",  # Ícone do navegador alterado para copo de suco
+)
+
+# --------- CSS para estilização ---------
 st.markdown(f"""
     <style>
-    .stApp {{
-        background-color: {BRITVIC_BG};
-    }}
-    .britvic-top-sep {{
-        margin-top: -30px;
-        margin-bottom: 18px;
-        border: none;
-        border-top: 2px solid {BRITVIC_PRIMARY};
-    }}
-    /* Title */
-    .britvic-title {{
-        font-size: 2.6rem;
-        font-weight: bold;
-        color: {BRITVIC_PRIMARY};
-        text-align: center;
-        margin-bottom: 0.1em;
-        margin-top: -22px;
-    }}
-    .subtitle {{
-        text-align: center;
-        color: {BRITVIC_PRIMARY};
-        font-size: 1.1rem;
-        margin-bottom: 0.7em;
-    }}
-    /* KPIs */
-    .kpi-card {{
-        background: {BRITVIC_KPI_BG};
-        border-radius: 13px;
-        box-shadow: 0 4px 32px 0 {BRITVIC_CARD_SHADOW};
-        padding: 18px 0 18px 0;
-        margin-bottom: 12px;
-        text-align: center;
-    }}
-    .kpi-value {{
-        color: {BRITVIC_PRIMARY};
-        font-size: 1.5em;
-        font-weight: 700;
-    }}
-    .kpi-label {{
-        color: {BRITVIC_ACCENT};
-        font-size: 1.1em;
-        font-weight: 500;
-        margin-bottom: 2px;
-    }}
-    .kpi-caption {{
-        font-size: 0.9em;
-        color: #666;
-    }}
-    /* Export Button */
-    .stDownloadButton>button {{
-        border-radius: 8px;
-        border: 1.5px solid {BRITVIC_PRIMARY};
-        background: {BRITVIC_ACCENT};
-        color: #fff;
-        font-weight: bold;
-        font-size: 1.05em;
-        padding: 7px 20px;
-        transition: 0.2s;
-    }}
-    .stDownloadButton>button:hover {{
-        background-color: {BRITVIC_PRIMARY};
-        color: #fff;
-        border-color: {BRITVIC_ACCENT};
-    }}
-    /* Sidebar */
-    section[data-testid="stSidebar"] {{
-        background-color: #ebf7ee;
-    }}
-    .sidebar-title-britvic {{
-        color: {BRITVIC_PRIMARY};
-        font-size: 1.3em;
-        font-weight:bold;
-        margin-bottom:8px;
-        margin-top: 0px;
-        text-align:left;
-    }}
-    .sidebar-reset-btn>button {{
-        background-color: #fff;
-        color: {BRITVIC_ACCENT};
-        border: 1.5px solid {BRITVIC_ACCENT};
-        border-radius: 6px;
-        font-weight: bold;
-        margin-top:6px;
-        transition:0.2s;
-        padding:2px 12px;
-    }}
-    .sidebar-reset-btn>button:hover {{
-        background-color: {BRITVIC_ACCENT};
-        color: #fff;
-    }}
+        .stApp {{
+            background-color: {BRITVIC_BG};
+        }}
+        .center {{
+            text-align: center;
+        }}
+        .britvic-title {{
+            font-size: 2.6rem;
+            font-weight: bold;
+            color: {BRITVIC_PRIMARY};
+            text-align: center;
+            margin-bottom: 0.3em;
+        }}
+        .subtitle {{
+            text-align: center;
+            color: {BRITVIC_PRIMARY};
+            font-size: 1.0rem;
+            margin-bottom: 1em;
+        }}
     </style>
 """, unsafe_allow_html=True)
 
-# --------- TOPO ---------
-# Separador acima para compactar topo
-st.markdown('<hr class="britvic-top-sep">', unsafe_allow_html=True)
-st.markdown(
-    """
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <img src="britvic_logo.png" width="180" style="margin-bottom: -8px"/>
-        <div class="britvic-title">Dashboard de Produção</div>
-        <div class="subtitle">
-            Os dados deste Dashboard são atualizados automaticamente a cada
-            <b style="color:#27AE60">10 minutos</b> a partir de uma planilha segura em nuvem (Google Drive).
+# --------- TOPO (Logo e Título) ---------
+# Carregando a logo para o Streamlit com `st.image`
+st.markdown("""<hr style="margin-top: -10px; margin-bottom: 15px;">""", unsafe_allow_html=True)
+
+# Mostrar logo e título no topo
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("britvic_logo.png", width=180)  # Substitua pelo caminho real da logo
+    st.markdown(
+        f"<div class='britvic-title'>Dashboard de Produção</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"""
+        <div class='subtitle'>
+        Os dados deste Dashboard são atualizados automaticamente a cada <b style="color:{BRITVIC_ACCENT}">10 minutos</b>
+        a partir de uma planilha segura em nuvem (Google Drive).
         </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.markdown('<hr class="britvic-top-sep">', unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
+st.markdown("""<hr style="margin-bottom: 20px;">""", unsafe_allow_html=True)
 
-# --------- SIDEBAR (2 - intuitiva e fácil de limpar) ---------
-st.sidebar.markdown('<div class="sidebar-title-britvic">🛠️ Filtros</div>', unsafe_allow_html=True)
+# --------- SIDEBAR (Filtros e comportamento do botão limpar filtros) ---------
+st.sidebar.markdown(f"<h2 style='color:{BRITVIC_PRIMARY};'>Filtros</h2>", unsafe_allow_html=True)
 
+# Funções auxiliares
+def nome_mes(numero):
+    return calendar.month_abbr[int(numero)]
+
+def tratar_dados(df):
+    errors = []
+    df = df.rename(columns=lambda x: x.strip().lower().replace(" ", "_"))
+    obrigatorias = ["categoria", "data", "caixas_produzidas"]
+    for col in obrigatorias:
+        if col not in df.columns:
+            errors.append(f"Coluna obrigatória ausente: {col}")
+    if "data" in df.columns:
+        try:
+            df["data"] = pd.to_datetime(df["data"])
+        except Exception:
+            errors.append("Erro ao converter coluna 'data'.")
+    # Drop NAs nas colunas essenciais e remove duplicatas
+    df = df.dropna(subset=["categoria", "data", "caixas_produzidas"]).drop_duplicates()
+    df["caixas_produzidas"] = pd.to_numeric(df["caixas_produzidas"], errors="coerce").fillna(0)
+    return df, errors
+
+# Filtro de dados simulados (substitua pelo carregamento real)
+data = {
+    "categoria": ["PET", "PET", "PET", "Vidro", "Vidro", "Lata"],
+    "data": pd.date_range("2022-01-01", periods=6, freq="M"),
+    "caixas_produzidas": [100, 120, 140, 110, 130, 90],
+}
+df_raw = pd.DataFrame(data)
+df, erros = tratar_dados(df_raw)
+
+if len(erros) > 0:
+    st.sidebar.warning
 
 def nome_mes(numero):
     import calendar
