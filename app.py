@@ -17,9 +17,13 @@ st.set_page_config(
     layout="wide",
     page_icon="🧃",
 )
-col1, col2, col3 = st.columns([1,2,1])
+col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("britvic_logo.png", width=240)
+    st.markdown(
+        "<h1 style='text-align:center; color:#003057;'>Dashboard de Produção</h1>", 
+        unsafe_allow_html=True
+    )
 # Título estilizado
 st.markdown(
     """
