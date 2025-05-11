@@ -23,6 +23,7 @@ with col2:
     st.markdown(
         "<h1 style='text-align:center; color:#003057;'>Dashboard de Produção</h1>", 
         unsafe_allow_html=True
+    )
 def nome_mes(numero):
     return calendar.month_abbr[int(numero)]
 
