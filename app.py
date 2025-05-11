@@ -71,15 +71,6 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <div class='subtitle'>
-    Os dados deste Dashboard são atualizados automaticamente a cada
-    <b style="color:#27AE60">10 minutos</b>
-    a partir de uma planilha segura em nuvem (Google Drive).
-    </div>
-""", unsafe_allow_html=True)
-st.markdown("""<hr style="margin-bottom: 20px;">""", unsafe_allow_html=True)
-
 def nome_mes(numero):
     return calendar.month_abbr[int(numero)]
 
