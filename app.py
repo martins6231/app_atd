@@ -24,7 +24,7 @@ with col2:
 st.markdown(
     """
     <h1 style="text-align: center; color: #003057;">
-        Dashboard de Produção - Britvic
+    Dashboard de Produção
     </h1>
     """,
     unsafe_allow_html=True,
