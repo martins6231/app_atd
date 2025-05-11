@@ -16,35 +16,57 @@ BRITVIC_PRIMARY = "#003057"  # Azul institucional escuro
 BRITVIC_ACCENT = "#27AE60"   # Verde Britvic
 BRITVIC_BG = "#F4FFF6"       # Fundo suave esverdeado
 
-# CSS para visual
+# Configuração da página
+st.set_page_config(
+    page_title="Dashboard de Produção - Britvic",
+    layout="wide",
+    page_icon="🧃",  # Pode trocar para o ícone desejado
+)
+
+# CSS customizado
 st.markdown(f"""
     <style>
-    .stApp {{background-color: {BRITVIC_BG};}}
-    .block-container {{padding-top: 1.2rem;}}
-    /* Sidebar */
-    section[data-testid="stSidebar"] {{
-        background-color: #ebf7ee;
+    /* Fundo da página */
+    .stApp {{
+        background-color: {BRITVIC_BG};
     }}
-    /* Metric titles */
-    div[data-testid="metric"] > div:first-child {{color: {BRITVIC_ACCENT}; font-weight: bold;}}
-    /* Expander headers */
-    details > summary {{
-        color: {BRITVIC_PRIMARY};
+
+    /* Centralização da logo e título */
+    .center {{
+        text-align: center;
+    }}
+
+    .britvic-title {{
+        font-size: 2.5rem;
         font-weight: bold;
-        font-size: 1.1rem;
-    }}
-    /* KPIs result */
-    div[data-testid="metric"] span {{
         color: {BRITVIC_PRIMARY};
+        margin-top: -20px; /* Ajuste do espaçamento acima */
+        margin-bottom: 20px; /* Ajuste do espaçamento abaixo */
     }}
-    /* Headers */
-    h1, h2, h3, h4, h5, h6 {{
-        color: {BRITVIC_PRIMARY} !important;
+
+    /* Subtítulo informativo */
+    .subtitle {{
+        text-align: center;
+        color: {BRITVIC_PRIMARY};
+        font-size: 1.2rem;
+        margin-bottom: 20px;
     }}
-    /* Download Button */
-    .stDownloadButton {{background-color: {BRITVIC_ACCENT}; color: #fff;}}
     </style>
 """, unsafe_allow_html=True)
+
+# Centralização da logo e título no topo
+st.markdown('<div class="center">', unsafe_allow_html=True)
+st.image("britvic_logo.png", width=250)
+st.markdown(f"""
+    <div class="britvic-title">Dashboard de Produção</div>
+    <div class="subtitle">
+        Os dados deste Dashboard são atualizados automaticamente a cada <b style="color:{BRITVIC_ACCENT}">10 minutos</b>
+        a partir de uma planilha segura em nuvem (Google Drive).
+    </div>
+""", unsafe_allow_html=True)
+
+# Separador
+st.markdown("<hr>", unsafe_allow_html=True)
 
 # Cabeçalho centralizado com logo
 col1, col2, col3 = st.columns([1, 2, 1])
