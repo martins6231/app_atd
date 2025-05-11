@@ -189,7 +189,7 @@ meses_selecionados = [map_mes[n] for n in meses_selecionados_nome]
 
 df_filtrado = filtrar_periodo(df, categoria_analise, anos_selecionados, meses_selecionados)
 
-st.subheader(f"Análise para categoria: <span style='color:{BRITVIC_ACCENT}'><b>{categoria_analise}</b></span>", unsafe_allow_html=True)
+st.markdown(     f"<h3 style='color:{BRITVIC_PRIMARY}; text-align:left;'>Análise para categoria: <span style='color:{BRITVIC_ACCENT};'><b>{categoria_analise}</b></span></h3>",     unsafe_allow_html=True )
 if df_filtrado.empty:
     st.error("Não há dados para esse período e categoria.")
     st.stop()
