@@ -48,27 +48,28 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --------- TOPO (Logo e Título) ---------
-st.markdown("""<hr style="margin-top: -10px; margin-bottom: 15px;">""", unsafe_allow_html=True)
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("britvic_logo.png", width=180)
-    st.markdown(
-        f"<div class='britvic-title'>Dashboard de Produção</div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"""
-        <div class='subtitle'>
-        Os dados deste Dashboard são atualizados automaticamente a cada <b style="color:{BRITVIC_ACCENT}">10 minutos</b>
-        a partir de uma planilha segura em nuvem (Google Drive).
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-st.markdown("""<hr style="margin-bottom: 20px;">""", unsafe_allow_html=True)
-
-def nome_mes(numero):
-    return calendar.month_abbr[int(numero)]
+# Centralizar logo e título em um único alinhamento
+st.markdown(f"""
+    <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: {BRITVIC_BG};
+        padding: 10px 0 20px 0;
+        margin-bottom: 20px;"
+    >
+        <img src="britvic_logo.png" alt="Britvic Logo" style="width: 150px; margin-bottom: 10px;">
+        <h1 style="
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: {BRITVIC_PRIMARY};
+            margin: 0;"
+        >
+            Dashboard de Produção
+        </h1>
+    </div>
+""", unsafe_allow_html=True)
 
 # ------------------ Download seguro da planilha -----------------
 def is_excel_file(file_path):
