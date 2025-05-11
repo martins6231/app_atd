@@ -67,21 +67,6 @@ st.markdown(f"""
 
 # Separador
 st.markdown("<hr>", unsafe_allow_html=True)
-
-# Cabeçalho centralizado com logo
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.image("britvic_logo.png", width=220)
-    st.markdown(
-        f"<h1 style='text-align:center; color:{BRITVIC_PRIMARY}; margin-bottom:0.4rem'>Dashboard de Produção</h1>", 
-        unsafe_allow_html=True)
-
-st.markdown(
-    f"""<p style="text-align: center; color: {BRITVIC_PRIMARY}; font-size: 18px;">
-        Os dados deste Dashboard são atualizados automaticamente a cada <b style="color:{BRITVIC_ACCENT}">10 minutos</b> a partir de uma planilha segura em nuvem (Google Drive).
-    </p>
-    """,
-    unsafe_allow_html=True,
 )
 
 def nome_mes(numero):
