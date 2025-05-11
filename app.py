@@ -15,14 +15,14 @@ from datetime import datetime
 st.set_page_config(
     page_title="Produção Britvic",
     layout="wide",
-    page_icon="🍏",
+    page_icon="🧃",
 )
 
 # Adicionando a logo
 st.markdown(
     """
     <div style="text-align: center;">
-        <img src="britvic_logo.png" alt="Logo Britvic" width="300"/>
+        <img src="britvic-seeklogo.png" alt="Logo Britvic" width="300"/>
     </div>
     """,
     unsafe_allow_html=True,
