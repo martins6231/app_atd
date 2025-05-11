@@ -11,35 +11,67 @@ from prophet import Prophet
 import calendar
 from datetime import datetime
 
-# Configurações iniciais do Streamlit
-st.set_page_config(
-    page_title="Produção Britvic",
-    layout="wide",
-    page_icon="🧃",
-)
+# Paleta Britvic
+BRITVIC_PRIMARY = "#003057"  # Azul institucional escuro
+BRITVIC_ACCENT = "#27AE60"   # Verde Britvic
+BRITVIC_BG = "#F4FFF6"       # Fundo suave esverdeado
+
+# CSS para visual
+st.markdown(f"""
+    <style>
+    .stApp {{background-color: {BRITVIC_BG};}}
+    .block-container {{padding-top: 1.2rem;}}
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background-color: #ebf7ee;
+    }}
+    /* Metric titles */
+    div[data-testid="metric"] > div:first-child {{color: {BRITVIC_ACCENT}; font-weight: bold;}}
+    /* Expander headers */
+    details > summary {{
+        color: {BRITVIC_PRIMARY};
+        font-weight: bold;
+        font-size: 1.1rem;
+    }}
+    /* KPIs result */
+    div[data-testid="metric"] span {{
+        color: {BRITVIC_PRIMARY};
+    }}
+    /* Headers */
+    h1, h2, h3, h4, h5, h6 {{
+        color: {BRITVIC_PRIMARY} !important;
+    }}
+    /* Download Button */
+    .stDownloadButton {{background-color: {BRITVIC_ACCENT}; color: #fff;}}
+    </style>
+""", unsafe_allow_html=True)
+
+# Cabeçalho centralizado com logo
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image("britvic_logo.png", width=240)
+    st.image("britvic_logo.png", width=220)
     st.markdown(
-        "<h1 style='text-align:center; color:#003057;'>Dashboard de Produção</h1>", 
-        unsafe_allow_html=True
-    )
-def nome_mes(numero):
-    return calendar.month_abbr[int(numero)]
-
-# Sidebar com configurações
-st.sidebar.header("Configurações")
+        f"<h1 style='text-align:center; color:{BRITVIC_PRIMARY}; margin-bottom:0.4rem'>Dashboard de Produção</h1>", 
+        unsafe_allow_html=True)
 
 st.markdown(
-    """
-    <p style="text-align: center; color: #003057; font-size: 18px;">
-        Os dados deste Dashboard são atualizados automaticamente a cada 10 minutos a partir de uma planilha segura em nuvem (Google Drive).
+    f"""<p style="text-align: center; color: {BRITVIC_PRIMARY}; font-size: 18px;">
+        Os dados deste Dashboard são atualizados automaticamente a cada <b style="color:{BRITVIC_ACCENT}">10 minutos</b> a partir de uma planilha segura em nuvem (Google Drive).
     </p>
     """,
     unsafe_allow_html=True,
 )
 
-# ------------------ Download seguro da planilha -----------------
+def nome_mes(numero):
+    return calendar.month_abbr[int(numero)]
+
+# Sidebar com cores
+st.sidebar.markdown(
+    f"<h2 style='color:{BRITVIC_PRIMARY};margin-bottom:0.2em'>Configurações</h2>", 
+    unsafe_allow_html=True)
+st.sidebar.markdown('---')
+
+# Download seguro planilha
 def is_excel_file(file_path):
     try:
         with zipfile.ZipFile(file_path):
@@ -50,7 +82,6 @@ def is_excel_file(file_path):
         return False
 
 def convert_gsheet_link(shared_url):
-    """Converte link /edit do Google Sheets para /export?format=xlsx"""
     if "docs.google.com/spreadsheets" in shared_url:
         import re
         match = re.search(r'/d/([a-zA-Z0-9-_]+)', shared_url)
@@ -59,7 +90,7 @@ def convert_gsheet_link(shared_url):
             return f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx'
     return shared_url
 
-@st.cache_data(ttl=600)  # Atualiza automaticamente a cada 10 minutos (600 segundos)
+@st.cache_data(ttl=600)
 def carregar_excel_nuvem(link):
     url = convert_gsheet_link(link)
     resp = requests.get(url)
@@ -88,8 +119,7 @@ df_raw = carregar_excel_nuvem(xlsx_url)
 if df_raw is None:
     st.stop()
 
-# ---------------------------------------------------------------
-
+# --- Análise e tratamento dos dados ---
 def tratar_dados(df):
     erros = []
     df = df.rename(columns=lambda x: x.strip().lower().replace(" ", "_"))
@@ -159,7 +189,7 @@ meses_selecionados = [map_mes[n] for n in meses_selecionados_nome]
 
 df_filtrado = filtrar_periodo(df, categoria_analise, anos_selecionados, meses_selecionados)
 
-st.subheader(f"Análise para categoria: **{categoria_analise}**")
+st.subheader(f"Análise para categoria: <span style='color:{BRITVIC_ACCENT}'><b>{categoria_analise}</b></span>", unsafe_allow_html=True)
 if df_filtrado.empty:
     st.error("Não há dados para esse período e categoria.")
     st.stop()
@@ -177,7 +207,7 @@ def exibe_kpis(df, categoria):
         ano = int(row['ano'])
         with cols[i]:
             st.metric(f"Ano {ano}", f"{int(row['sum']):,} caixas")
-            st.caption(f"Média diária: {row['mean']:.0f}  \nQuantidade de registros: {row['count']}")
+            st.caption(f"<span style='color:{BRITVIC_ACCENT}'><b>Média diária:</b></span> {row['mean']:.0f} <br><span style='color:{BRITVIC_ACCENT}'><b>Registros:</b></span> {row['count']}", unsafe_allow_html=True)
     return kpis
 
 exibe_kpis(df_filtrado, categoria_analise)
@@ -194,8 +224,10 @@ def plot_tendencia(df, categoria):
         markers=True,
         labels={"data":"Data", "caixas_produzidas":"Caixas Produzidas"}
     )
-    fig.update_traces(line_color="#636EFA", line_width=2, marker=dict(size=7, color="darkblue"))
-    fig.update_layout(template="plotly_white", hovermode="x")
+    fig.update_traces(line_color=BRITVIC_PRIMARY, line_width=2, marker=dict(size=7, color=BRITVIC_ACCENT))
+    fig.update_layout(template="plotly_white", hovermode="x",
+        title_font_color=BRITVIC_PRIMARY,
+        plot_bgcolor=BRITVIC_BG)
     st.plotly_chart(fig, use_container_width=True)
 
 def plot_variacao_mensal(df, categoria):
@@ -208,15 +240,15 @@ def plot_variacao_mensal(df, categoria):
         title=f"Produção Mensal Total - {categoria}",
         labels={"mes":"Mês/Ano", "caixas_produzidas":"Caixas Produzidas"}
     )
-    fig1.update_traces(marker_color="#27AE60")
-    fig1.update_layout(template="plotly_white")
+    fig1.update_traces(marker_color=BRITVIC_ACCENT)
+    fig1.update_layout(template="plotly_white", title_font_color=BRITVIC_PRIMARY, plot_bgcolor=BRITVIC_BG)
     fig2 = px.line(
         mensal, x='mes', y='var_%', markers=True,
         title=f"Variação Percentual Mensal (%) - {categoria}",
         labels={"mes":"Mês/Ano", "var_%":"Variação (%)"}
     )
-    fig2.update_traces(line_color="#E67E22", marker=dict(size=7))
-    fig2.update_layout(template="plotly_white")
+    fig2.update_traces(line_color="#E67E22", marker=dict(size=7, color=BRITVIC_ACCENT))
+    fig2.update_layout(template="plotly_white", title_font_color=BRITVIC_PRIMARY, plot_bgcolor=BRITVIC_BG)
     st.plotly_chart(fig1, use_container_width=True)
     st.plotly_chart(fig2, use_container_width=True)
 
@@ -230,7 +262,7 @@ def plot_sazonalidade(df, categoria):
         points='all', notched=True,
         title=f"Sazonalidade Mensal - {categoria}",
         labels={'mes':"Mês", "caixas_produzidas":"Produção"},
-        hover_data=["ano"]
+        hover_data=["ano"], color_discrete_sequence=px.colors.sequential.Teal[::-1]
     )
     fig.update_layout(
         xaxis=dict(
@@ -239,7 +271,9 @@ def plot_sazonalidade(df, categoria):
             ticktext=[nome_mes(m) for m in range(1,13)]
         ),
         template="plotly_white",
-        legend_title="Ano"
+        legend_title="Ano",
+        title_font_color=BRITVIC_PRIMARY,
+        plot_bgcolor=BRITVIC_BG
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -250,14 +284,16 @@ def plot_comparativo_ano_mes(df, categoria):
     tab = tab.sort_values(['mes'])
     fig = go.Figure()
     anos = sorted(tab['ano'].unique())
-    for ano in anos:
+    cores = px.colors.qualitative.Dark24
+    for idx, ano in enumerate(anos):
         dados_ano = tab[tab['ano'] == ano]
         fig.add_trace(go.Bar(
             x=dados_ano['mes_nome'],
             y=dados_ano['caixas_produzidas'],
             name=str(ano),
             text=dados_ano['caixas_produzidas'],
-            textposition='auto'
+            textposition='auto',
+            marker_color=cores[idx % len(cores)]
         ))
     fig.update_layout(
         barmode='group',
@@ -266,7 +302,9 @@ def plot_comparativo_ano_mes(df, categoria):
         yaxis_title="Caixas Produzidas",
         legend_title="Ano",
         hovermode="x unified",
-        template="plotly_white"
+        template="plotly_white",
+        title_font_color=BRITVIC_PRIMARY,
+        plot_bgcolor=BRITVIC_BG
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -278,7 +316,8 @@ def plot_comparativo_acumulado(df, categoria):
         res, x='mes', y='acumulado', color=res['ano'].astype(str),
         markers=True,
         labels={'mes':"Mês", 'acumulado':"Caixas Acumuladas", 'ano':'Ano'},
-        title=f"Produção Acumulada Mês a Mês - {categoria}"
+        title=f"Produção Acumulada Mês a Mês - {categoria}",
+        color_discrete_sequence=px.colors.sequential.Teal[::-1]
     )
     fig.update_traces(mode="lines+markers")
     fig.update_layout(
@@ -289,7 +328,9 @@ def plot_comparativo_acumulado(df, categoria):
             ticktext=[nome_mes(m) for m in range(1,13)]
         ),
         hovermode="x unified",
-        template="plotly_white"
+        template="plotly_white",
+        title_font_color=BRITVIC_PRIMARY,
+        plot_bgcolor=BRITVIC_BG
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -311,17 +352,19 @@ def plot_previsao(dados_hist, previsao, categoria):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dados_hist['ds'], y=dados_hist['y'],
                              mode='lines+markers', name='Histórico',
-                             line=dict(color='#2980B9', width=2),
-                             marker=dict(color='#154360')))
+                             line=dict(color=BRITVIC_PRIMARY, width=2),
+                             marker=dict(color=BRITVIC_ACCENT)))
     fig.add_trace(go.Scatter(x=previsao['ds'], y=previsao['yhat'],
-                             mode='lines', name='Previsão', line=dict(color='#27AE60', width=2)))
+                             mode='lines', name='Previsão', line=dict(color=BRITVIC_ACCENT, width=2)))
     fig.add_trace(go.Scatter(x=previsao['ds'], y=previsao['yhat_upper'],
                              line=dict(dash='dash', color='#AED6F1'), name='Limite Superior', opacity=0.3))
     fig.add_trace(go.Scatter(x=previsao['ds'], y=previsao['yhat_lower'],
                              line=dict(dash='dash', color='#AED6F1'), name='Limite Inferior', opacity=0.3))
     fig.update_layout(title=f"Previsão de Produção - {categoria}",
                      xaxis_title="Data", yaxis_title="Caixas Produzidas",
-                     template="plotly_white", hovermode="x unified")
+                     template="plotly_white", hovermode="x unified",
+                     title_font_color=BRITVIC_PRIMARY,
+                     plot_bgcolor=BRITVIC_BG)
     st.plotly_chart(fig, use_container_width=True)
 
 def gerar_insights(df, categoria):
