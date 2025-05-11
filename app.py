@@ -48,13 +48,10 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --------- TOPO (Logo e Título) ---------
-# Carregando a logo para o Streamlit com `st.image`
 st.markdown("""<hr style="margin-top: -10px; margin-bottom: 15px;">""", unsafe_allow_html=True)
-
-# Mostrar logo e título no topo
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image("britvic_logo.png", width=180)  # Substitua pelo caminho real da logo
+    st.image("britvic_logo.png", width=180)
     st.markdown(
         f"<div class='britvic-title'>Dashboard de Produção</div>",
         unsafe_allow_html=True,
@@ -68,16 +65,9 @@ with col2:
         """,
         unsafe_allow_html=True,
     )
-
 st.markdown("""<hr style="margin-bottom: 20px;">""", unsafe_allow_html=True)
-df_raw = pd.DataFrame(data)
-df, erros = tratar_dados(df_raw)
-
-if len(erros) > 0:
-    st.sidebar.warning
 
 def nome_mes(numero):
-    import calendar
     return calendar.month_abbr[int(numero)]
 
 # ------------------ Download seguro da planilha -----------------
@@ -184,7 +174,6 @@ def gerar_dataset_modelo(df, categoria=None):
     grupo = df_cat.groupby('data')['caixas_produzidas'].sum().reset_index()
     return grupo.sort_values('data')
 
-
 # -------- SELEÇÃO DE PARÂMETROS (Sidebar UX melhorada) --------
 
 categorias = selecionar_categoria(df)
@@ -193,7 +182,6 @@ meses_disp = sorted(df['data'].dt.month.drop_duplicates())
 meses_nome = [f"{m:02d} - {calendar.month_name[m]}" for m in meses_disp]
 map_mes = dict(zip(meses_nome, meses_disp))
 
-# Utiliza session_state para limpar filtros
 default_categoria = categorias[0] if categorias else None
 default_anos = anos_disp
 default_meses_nome = meses_nome
@@ -210,12 +198,6 @@ with st.sidebar:
     anos_selecionados = st.multiselect("📅 Ano(s):", anos_disp, default=st.session_state["filtros"]["anos"], key="anobox")
     meses_selecionados_nome = st.multiselect("📆 Mês(es):", meses_nome, default=st.session_state["filtros"]["meses_nome"], key="mesbox")
 
-    # Botão Limpar Filtros
-    if st.container().button("Limpar filtros", key="reset-filtros", help="Restaurar seleção para todos", use_container_width=True):
-        st.session_state["catbox"] = default_categoria
-        st.session_state["anobox"] = default_anos
-        st.session_state["mesbox"] = default_meses_nome
-
 # Após interação, atualizar session_state também
 st.session_state["filtros"]["categoria"] = st.session_state["catbox"]
 st.session_state["filtros"]["anos"] = st.session_state["anobox"]
@@ -225,7 +207,7 @@ meses_selecionados = [map_mes[n] for n in st.session_state["filtros"]["meses_nom
 
 df_filtrado = filtrar_periodo(df, st.session_state["filtros"]["categoria"], st.session_state["filtros"]["anos"], meses_selecionados)
 
-# --------- SUBTÍTULO PRINCIPAL (Manter branding visual) ---------
+# --------- SUBTÍTULO PRINCIPAL ---------
 st.markdown(
     f"<h3 style='color:{BRITVIC_ACCENT}; text-align:left;'>Análise para categoria: <b>{st.session_state['filtros']['categoria']}</b></h3>",
     unsafe_allow_html=True
@@ -234,33 +216,51 @@ if df_filtrado.empty:
     st.error("Não há dados para esse período e categoria.")
     st.stop()
 
-# --------- MÉTRICAS / KPIs com destaque Britvic ---------
+# --------- MÉTRICAS / KPIs Britvic (centralizadas, atrativas, institucional) ---------
 def exibe_kpis(df, categoria):
     df_cat = df[df['categoria'] == categoria]
     if df_cat.empty:
         st.info("Sem dados para a seleção.")
         return None
     df_cat['ano'] = df_cat['data'].dt.year
-    kpis = df_cat.groupby('ano')['caixas_produzidas'].agg(['sum','mean','std','count']).reset_index()
-    cols = st.columns(len(kpis))
-    kpi_icon = "📦"
-    for i, (_, row) in enumerate(kpis.iterrows()):
+    kpis = df_cat.groupby('ano')['caixas_produzidas'].agg(['sum', 'mean', 'std', 'count']).reset_index()
+    
+    # Cards centrais com identidade Britvic
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 18px;">
+        """, unsafe_allow_html=True
+    )
+    for _, row in kpis.iterrows():
         ano = int(row['ano'])
-        with cols[i]:
-            st.markdown(
-                f'''
-                <div class="kpi-card">
-                    <div class="kpi-label">{kpi_icon} Ano {ano}</div>
-                    <div class="kpi-value">{int(row['sum']):,} caixas</div>
-                    <div class="kpi-caption">Média diária: {row['mean']:.0f} <br> Registros: {row['count']}</div>
+        st.markdown(
+            f"""
+            <div style="
+                background: #e8f8ee;
+                border-radius: 18px;
+                box-shadow: 0 6px 28px 0 rgba(0, 48, 87, 0.13);
+                padding: 28px 38px 22px 38px;
+                min-width: 220px;
+                margin-bottom: 13px;
+                text-align: center;
+            ">
+                <div style="font-weight: 600; color: {BRITVIC_PRIMARY}; font-size: 1.12em; margin-bottom:5px;">
+                    📦 Ano {ano}
                 </div>
-                ''',
-                unsafe_allow_html=True
-            )
+                <div style="color: {BRITVIC_ACCENT}; font-size:2.1em; font-weight:bold; margin-bottom:7px;">
+                    {int(row['sum']):,} caixas
+                </div>
+                <div style="font-size: 1.08em; color: {BRITVIC_PRIMARY}; margin-bottom:2px;">
+                    Média diária:<br><b style="color:{BRITVIC_ACCENT};font-size:1.15em">{row['mean']:.0f}</b>
+                </div>
+                <div style="font-size: 1em; color: #666;">Registros: <b>{row['count']}</b></div>
+            </div>
+            """, unsafe_allow_html=True
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
     return kpis
 
 exibe_kpis(df_filtrado, st.session_state["filtros"]["categoria"])
-
 
 # --------- GRÁFICOS ---------
 def plot_tendencia(df, categoria):
