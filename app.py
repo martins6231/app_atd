@@ -20,16 +20,6 @@ st.set_page_config(
 col1, col2, col3 = st.columns([1,2,1])
 with col2:
     st.image("britvic_logo.png", width=240)
-# Adicionando a logo
-st.markdown(
-    """
-    <div style="text-align: center;">
-        <img src="britvic_logo.png" alt="Logo Britvic" width="300"/>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
 # Título estilizado
 st.markdown(
     """
