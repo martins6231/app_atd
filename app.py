@@ -20,10 +20,6 @@ st.set_page_config(
 col1, col2, col3 = st.columns([1,2,1])
 with col2:
     st.image("britvic_logo.png", width=240)
-    st.markdown(
-        "<h1 style='text-align: center; color: #003057;'>🔎 Acompanhamento de Produção - Britvic</h1>", 
-        unsafe_allow_html=True
-    )
 # Adicionando a logo
 st.markdown(
     """
