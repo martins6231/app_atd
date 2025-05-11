@@ -11,72 +11,137 @@ from prophet import Prophet
 import calendar
 from datetime import datetime
 
-# Paleta Britvic
-BRITVIC_PRIMARY = "#003057"  # Azul institucional escuro
-BRITVIC_ACCENT = "#27AE60"   # Verde Britvic
-BRITVIC_BG = "#F4FFF6"       # Fundo suave esverdeado
+# --------- PALETA BRITVIC ---------
+BRITVIC_PRIMARY = "#003057"        # Azul
+BRITVIC_ACCENT = "#27AE60"         # Verde
+BRITVIC_BG = "#F4FFF6"             # Fundo leve esverdeado
+BRITVIC_KPI_BG = "#e8f8ee"         # Fundo KPIs
+BRITVIC_CARD_SHADOW = "rgba(0, 48, 87, 0.13)"  # Sombra leve nos cartões
 
-# Configuração da página
-st.set_page_config(
-    page_title="Dashboard de Produção - Britvic",
-    layout="wide",
-    page_icon="🧃",  # Pode trocar para o ícone desejado
-)
-
-# CSS customizado
+# --------- CSS ---------
 st.markdown(f"""
     <style>
-    /* Fundo da página */
     .stApp {{
         background-color: {BRITVIC_BG};
     }}
-
-    /* Centralização da logo e título */
-    .center {{
-        text-align: center;
+    .britvic-top-sep {{
+        margin-top: -30px;
+        margin-bottom: 18px;
+        border: none;
+        border-top: 2px solid {BRITVIC_PRIMARY};
     }}
-
+    /* Title */
     .britvic-title {{
-        font-size: 2.5rem;
+        font-size: 2.6rem;
         font-weight: bold;
         color: {BRITVIC_PRIMARY};
-        margin-top: -20px; /* Ajuste do espaçamento acima */
-        margin-bottom: 20px; /* Ajuste do espaçamento abaixo */
+        text-align: center;
+        margin-bottom: 0.1em;
+        margin-top: -22px;
     }}
-
-    /* Subtítulo informativo */
     .subtitle {{
         text-align: center;
         color: {BRITVIC_PRIMARY};
-        font-size: 1.2rem;
-        margin-bottom: 20px;
+        font-size: 1.1rem;
+        margin-bottom: 0.7em;
+    }}
+    /* KPIs */
+    .kpi-card {{
+        background: {BRITVIC_KPI_BG};
+        border-radius: 13px;
+        box-shadow: 0 4px 32px 0 {BRITVIC_CARD_SHADOW};
+        padding: 18px 0 18px 0;
+        margin-bottom: 12px;
+        text-align: center;
+    }}
+    .kpi-value {{
+        color: {BRITVIC_PRIMARY};
+        font-size: 1.5em;
+        font-weight: 700;
+    }}
+    .kpi-label {{
+        color: {BRITVIC_ACCENT};
+        font-size: 1.1em;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }}
+    .kpi-caption {{
+        font-size: 0.9em;
+        color: #666;
+    }}
+    /* Export Button */
+    .stDownloadButton>button {{
+        border-radius: 8px;
+        border: 1.5px solid {BRITVIC_PRIMARY};
+        background: {BRITVIC_ACCENT};
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.05em;
+        padding: 7px 20px;
+        transition: 0.2s;
+    }}
+    .stDownloadButton>button:hover {{
+        background-color: {BRITVIC_PRIMARY};
+        color: #fff;
+        border-color: {BRITVIC_ACCENT};
+    }}
+    /* Sidebar */
+    section[data-testid="stSidebar"] {{
+        background-color: #ebf7ee;
+    }}
+    .sidebar-title-britvic {{
+        color: {BRITVIC_PRIMARY};
+        font-size: 1.3em;
+        font-weight:bold;
+        margin-bottom:8px;
+        margin-top: 0px;
+        text-align:left;
+    }}
+    .sidebar-reset-btn>button {{
+        background-color: #fff;
+        color: {BRITVIC_ACCENT};
+        border: 1.5px solid {BRITVIC_ACCENT};
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top:6px;
+        transition:0.2s;
+        padding:2px 12px;
+    }}
+    .sidebar-reset-btn>button:hover {{
+        background-color: {BRITVIC_ACCENT};
+        color: #fff;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# Centralização da logo e título no topo
-st.markdown('<div class="center">', unsafe_allow_html=True)
-st.image("britvic_logo.png", width=250)
-st.markdown(f"""
-    <div class="britvic-title">Dashboard de Produção</div>
-    <div class="subtitle">
-        Os dados deste Dashboard são atualizados automaticamente a cada <b style="color:{BRITVIC_ACCENT}">10 minutos</b>
-        a partir de uma planilha segura em nuvem (Google Drive).
+# --------- TOPO ---------
+# Separador acima para compactar topo
+st.markdown('<hr class="britvic-top-sep">', unsafe_allow_html=True)
+st.markdown(
+    """
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <img src="britvic_logo.png" width="180" style="margin-bottom: -8px"/>
+        <div class="britvic-title">Dashboard de Produção</div>
+        <div class="subtitle">
+            Os dados deste Dashboard são atualizados automaticamente a cada
+            <b style="color:#27AE60">10 minutos</b> a partir de uma planilha segura em nuvem (Google Drive).
+        </div>
     </div>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
+st.markdown('<hr class="britvic-top-sep">', unsafe_allow_html=True)
 
-# Separador
-st.markdown("<hr>", unsafe_allow_html=True)
+
+# --------- SIDEBAR (2 - intuitiva e fácil de limpar) ---------
+st.sidebar.markdown('<div class="sidebar-title-britvic">🛠️ Filtros</div>', unsafe_allow_html=True)
+
+
 def nome_mes(numero):
+    import calendar
     return calendar.month_abbr[int(numero)]
 
-# Sidebar com cores
-st.sidebar.markdown(
-    f"<h2 style='color:{BRITVIC_PRIMARY};margin-bottom:0.2em'>Configurações</h2>", 
-    unsafe_allow_html=True)
-st.sidebar.markdown('---')
-
-# Download seguro planilha
+# ------------------ Download seguro da planilha -----------------
 def is_excel_file(file_path):
     try:
         with zipfile.ZipFile(file_path):
@@ -124,7 +189,8 @@ df_raw = carregar_excel_nuvem(xlsx_url)
 if df_raw is None:
     st.stop()
 
-# --- Análise e tratamento dos dados ---
+# ---------------------------------------------------------------
+
 def tratar_dados(df):
     erros = []
     df = df.rename(columns=lambda x: x.strip().lower().replace(" ", "_"))
@@ -179,27 +245,57 @@ def gerar_dataset_modelo(df, categoria=None):
     grupo = df_cat.groupby('data')['caixas_produzidas'].sum().reset_index()
     return grupo.sort_values('data')
 
-# -------- SELEÇÃO DE PARÂMETROS --------
+
+# -------- SELEÇÃO DE PARÂMETROS (Sidebar UX melhorada) --------
+
 categorias = selecionar_categoria(df)
-categoria_analise = st.sidebar.selectbox("Categoria:", categorias)
-
-anos_disp = sorted(df[df['categoria'] == categoria_analise]['data'].dt.year.unique())
-anos_selecionados = st.sidebar.multiselect("Ano(s):", anos_disp, default=anos_disp)
-
-meses_disp = sorted(df[(df['categoria'] == categoria_analise) & (df['data'].dt.year.isin(anos_selecionados))]['data'].dt.month.unique())
+anos_disp = sorted(df['data'].dt.year.drop_duplicates())
+meses_disp = sorted(df['data'].dt.month.drop_duplicates())
 meses_nome = [f"{m:02d} - {calendar.month_name[m]}" for m in meses_disp]
 map_mes = dict(zip(meses_nome, meses_disp))
-meses_selecionados_nome = st.sidebar.multiselect("Mês(es):", meses_nome, default=meses_nome)
-meses_selecionados = [map_mes[n] for n in meses_selecionados_nome]
 
-df_filtrado = filtrar_periodo(df, categoria_analise, anos_selecionados, meses_selecionados)
+# Utiliza session_state para limpar filtros
+default_categoria = categorias[0] if categorias else None
+default_anos = anos_disp
+default_meses_nome = meses_nome
 
-st.markdown(     f"<h3 style='color:{BRITVIC_PRIMARY}; text-align:left;'>Análise para categoria: <span style='color:{BRITVIC_ACCENT};'><b>{categoria_analise}</b></span></h3>",     unsafe_allow_html=True )
+if "filtros" not in st.session_state:
+    st.session_state["filtros"] = {
+        "categoria": default_categoria,
+        "anos": default_anos,
+        "meses_nome": default_meses_nome
+    }
+
+with st.sidebar:
+    categoria_analise = st.selectbox("🏷️ Categoria:", categorias, index=categorias.index(st.session_state["filtros"]["categoria"]) if categorias else 0, key="catbox")
+    anos_selecionados = st.multiselect("📅 Ano(s):", anos_disp, default=st.session_state["filtros"]["anos"], key="anobox")
+    meses_selecionados_nome = st.multiselect("📆 Mês(es):", meses_nome, default=st.session_state["filtros"]["meses_nome"], key="mesbox")
+
+    # Botão Limpar Filtros
+    if st.container().button("Limpar filtros", key="reset-filtros", help="Restaurar seleção para todos", use_container_width=True):
+        st.session_state["catbox"] = default_categoria
+        st.session_state["anobox"] = default_anos
+        st.session_state["mesbox"] = default_meses_nome
+
+# Após interação, atualizar session_state também
+st.session_state["filtros"]["categoria"] = st.session_state["catbox"]
+st.session_state["filtros"]["anos"] = st.session_state["anobox"]
+st.session_state["filtros"]["meses_nome"] = st.session_state["mesbox"]
+
+meses_selecionados = [map_mes[n] for n in st.session_state["filtros"]["meses_nome"] if n in map_mes]
+
+df_filtrado = filtrar_periodo(df, st.session_state["filtros"]["categoria"], st.session_state["filtros"]["anos"], meses_selecionados)
+
+# --------- SUBTÍTULO PRINCIPAL (Manter branding visual) ---------
+st.markdown(
+    f"<h3 style='color:{BRITVIC_ACCENT}; text-align:left;'>Análise para categoria: <b>{st.session_state['filtros']['categoria']}</b></h3>",
+    unsafe_allow_html=True
+)
 if df_filtrado.empty:
     st.error("Não há dados para esse período e categoria.")
     st.stop()
 
-# --------- KPIs ---------
+# --------- MÉTRICAS / KPIs com destaque Britvic ---------
 def exibe_kpis(df, categoria):
     df_cat = df[df['categoria'] == categoria]
     if df_cat.empty:
@@ -208,14 +304,24 @@ def exibe_kpis(df, categoria):
     df_cat['ano'] = df_cat['data'].dt.year
     kpis = df_cat.groupby('ano')['caixas_produzidas'].agg(['sum','mean','std','count']).reset_index()
     cols = st.columns(len(kpis))
+    kpi_icon = "📦"
     for i, (_, row) in enumerate(kpis.iterrows()):
         ano = int(row['ano'])
         with cols[i]:
-            st.metric(f"Ano {ano}", f"{int(row['sum']):,} caixas")
-            st.caption(f"<span style='color:{BRITVIC_ACCENT}'><b>Média diária:</b></span> {row['mean']:.0f} <br><span style='color:{BRITVIC_ACCENT}'><b>Registros:</b></span> {row['count']}", unsafe_allow_html=True)
+            st.markdown(
+                f'''
+                <div class="kpi-card">
+                    <div class="kpi-label">{kpi_icon} Ano {ano}</div>
+                    <div class="kpi-value">{int(row['sum']):,} caixas</div>
+                    <div class="kpi-caption">Média diária: {row['mean']:.0f} <br> Registros: {row['count']}</div>
+                </div>
+                ''',
+                unsafe_allow_html=True
+            )
     return kpis
 
-exibe_kpis(df_filtrado, categoria_analise)
+exibe_kpis(df_filtrado, st.session_state["filtros"]["categoria"])
+
 
 # --------- GRÁFICOS ---------
 def plot_tendencia(df, categoria):
@@ -411,25 +517,25 @@ def exportar_consolidado(df, previsao, categoria):
     return base_export, nome_arq
 
 # -- Execução dos gráficos e análises --
-plot_tendencia(df_filtrado, categoria_analise)
-plot_variacao_mensal(df_filtrado, categoria_analise)
-plot_sazonalidade(df_filtrado, categoria_analise)
+plot_tendencia(df_filtrado, st.session_state["filtros"]["categoria"])
+plot_variacao_mensal(df_filtrado, st.session_state["filtros"]["categoria"])
+plot_sazonalidade(df_filtrado, st.session_state["filtros"]["categoria"])
 if len(set(df_filtrado['data'].dt.year)) > 1:
-    plot_comparativo_ano_mes(df_filtrado, categoria_analise)
-    plot_comparativo_acumulado(df_filtrado, categoria_analise)
-dados_hist, previsao, modelo_prophet = rodar_previsao_prophet(df_filtrado, categoria_analise, meses_futuro=6)
-plot_previsao(dados_hist, previsao, categoria_analise)
-gerar_insights(df_filtrado, categoria_analise)
+    plot_comparativo_ano_mes(df_filtrado, st.session_state["filtros"]["categoria"])
+    plot_comparativo_acumulado(df_filtrado, st.session_state["filtros"]["categoria"])
+dados_hist, previsao, modelo_prophet = rodar_previsao_prophet(df_filtrado, st.session_state["filtros"]["categoria"], meses_futuro=6)
+plot_previsao(dados_hist, previsao, st.session_state["filtros"]["categoria"])
+gerar_insights(df_filtrado, st.session_state["filtros"]["categoria"])
 
-# Exportação de consolidado
+# --------- EXPORTAÇÃO AMIGÁVEL ---------
 with st.expander("Exportação"):
-    if st.button("Exportar consolidado com previsão (.xlsx)"):
-        base_export, nome_arq = exportar_consolidado(df_filtrado, previsao, categoria_analise)
+    if st.button("⬇️ Exportar consolidado com previsão (.xlsx)", help="Clique para exportar os dados atuais filtrados para Excel"):
+        base_export, nome_arq = exportar_consolidado(df_filtrado, previsao, st.session_state["filtros"]["categoria"])
         buffer = io.BytesIO()
         base_export.to_excel(buffer, index=False, engine='openpyxl')
         buffer.seek(0)
         st.download_button(
-            label="Download arquivo Excel",
+            label="Download arquivo Excel ⬇️",
             data=buffer,
             file_name=nome_arq,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
