@@ -48,7 +48,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --------- TOPO (Logo e Título) ---------
-# Centralizar logo e título em um único alinhamento
+# Centralizar logo e título em um único alinhamento (NOVO FRAGMENTO)
 st.markdown(f"""
     <div style="
         display: flex;
@@ -70,6 +70,18 @@ st.markdown(f"""
         </h1>
     </div>
 """, unsafe_allow_html=True)
+
+st.markdown("""
+    <div class='subtitle'>
+    Os dados deste Dashboard são atualizados automaticamente a cada
+    <b style="color:#27AE60">10 minutos</b>
+    a partir de uma planilha segura em nuvem (Google Drive).
+    </div>
+""", unsafe_allow_html=True)
+st.markdown("""<hr style="margin-bottom: 20px;">""", unsafe_allow_html=True)
+
+def nome_mes(numero):
+    return calendar.month_abbr[int(numero)]
 
 # ------------------ Download seguro da planilha -----------------
 def is_excel_file(file_path):
