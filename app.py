@@ -70,37 +70,6 @@ with col2:
     )
 
 st.markdown("""<hr style="margin-bottom: 20px;">""", unsafe_allow_html=True)
-
-# --------- SIDEBAR (Filtros e comportamento do botão limpar filtros) ---------
-st.sidebar.markdown(f"<h2 style='color:{BRITVIC_PRIMARY};'>Filtros</h2>", unsafe_allow_html=True)
-
-# Funções auxiliares
-def nome_mes(numero):
-    return calendar.month_abbr[int(numero)]
-
-def tratar_dados(df):
-    errors = []
-    df = df.rename(columns=lambda x: x.strip().lower().replace(" ", "_"))
-    obrigatorias = ["categoria", "data", "caixas_produzidas"]
-    for col in obrigatorias:
-        if col not in df.columns:
-            errors.append(f"Coluna obrigatória ausente: {col}")
-    if "data" in df.columns:
-        try:
-            df["data"] = pd.to_datetime(df["data"])
-        except Exception:
-            errors.append("Erro ao converter coluna 'data'.")
-    # Drop NAs nas colunas essenciais e remove duplicatas
-    df = df.dropna(subset=["categoria", "data", "caixas_produzidas"]).drop_duplicates()
-    df["caixas_produzidas"] = pd.to_numeric(df["caixas_produzidas"], errors="coerce").fillna(0)
-    return df, errors
-
-# Filtro de dados simulados (substitua pelo carregamento real)
-data = {
-    "categoria": ["PET", "PET", "PET", "Vidro", "Vidro", "Lata"],
-    "data": pd.date_range("2022-01-01", periods=6, freq="M"),
-    "caixas_produzidas": [100, 120, 140, 110, 130, 90],
-}
 df_raw = pd.DataFrame(data)
 df, erros = tratar_dados(df_raw)
 
