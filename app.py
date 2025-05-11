@@ -68,7 +68,6 @@ st.markdown(f"""
 # Separador
 st.markdown("<hr>", unsafe_allow_html=True)
 )
-
 def nome_mes(numero):
     return calendar.month_abbr[int(numero)]
 
