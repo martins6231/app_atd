@@ -68,6 +68,7 @@ def t(msg_key, **kwargs):
             "excel_open_error": "Erro ao abrir o Excel: {err}",
             "kpi_year": "📦 Ano {ano}",
             "kpi_sum": "{qtd:,} caixas",
+            "historico": "Histórico",
             "kpi_daily_avg": "Média diária:<br><b style='color:{accent};font-size:1.15em'>{media:.0f}</b>",
             "kpi_records": "Registros: <b>{count}</b>",
             # Labels
@@ -122,6 +123,7 @@ def t(msg_key, **kwargs):
             "excel_open_error": "Error opening Excel: {err}",
             "kpi_year": "📦 Year {ano}",
             "kpi_sum": "{qtd:,} boxes",
+            "historico": "History",
             "kpi_daily_avg": "Daily avg.:<br><b style='color:{accent};font-size:1.15em'>{media:.0f}</b>",
             "kpi_records": "Records: <b>{count}</b>",
             # Labels
@@ -534,7 +536,7 @@ def plot_previsao(dados_hist, previsao, categoria):
         return
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dados_hist['ds'], y=dados_hist['y'],
-                             mode='lines+markers', name='Histórico',
+                             mode='lines+markers', name=t("historico"),
                              line=dict(color=BRITVIC_PRIMARY, width=2),
                              marker=dict(color=BRITVIC_ACCENT)))
     fig.add_trace(go.Scatter(x=previsao['ds'], y=previsao['yhat'],
