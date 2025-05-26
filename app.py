@@ -614,3 +614,10 @@ with st.expander(t("export")):
             file_name=nome_arq,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+# Rodapé
+st.markdown("""
+<div class="footer">
+    <p>© 2025 Dashboard de Produção | Desenvolvido por Matheus Martins Lopes usando Streamlit</p>
+    <p><small>Versão 2.0.0 | Última atualização: Maio 2025</small></p>
+</div>
+""", unsafe_allow_html=True)
